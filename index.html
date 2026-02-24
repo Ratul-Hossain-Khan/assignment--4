@@ -1,145 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Job Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Application Tracker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-[#f6f8fb]">
 
-<div class="max-w-7xl mx-auto p-4">
+<div class="max-w-6xl mx-auto p-4">
 
-  <!-- Dashboard -->
+  <!-- Header -->
+  <h1 class="text-2xl font-bold mb-4">Job Application Tracker</h1>
+
+  <!-- Dashboard Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
     <div class="bg-white p-4 rounded shadow">
-      <h3 class="font-semibold">Total Jobs</h3>
-      <p id="totalCount" class="text-3xl font-bold text-blue-600">8</p>
+      <p class="text-sm">Total</p>
+      <h2 id="totalCount" class="text-2xl font-bold">0</h2>
     </div>
     <div class="bg-white p-4 rounded shadow">
-      <h3 class="font-semibold">Interview</h3>
-      <p id="interviewCount" class="text-3xl font-bold text-green-600">0</p>
+      <p class="text-sm">Interview</p>
+      <h2 id="interviewCount" class="text-2xl font-bold text-green-600">0</h2>
     </div>
     <div class="bg-white p-4 rounded shadow">
-      <h3 class="font-semibold">Rejected</h3>
-      <p id="rejectedCount" class="text-3xl font-bold text-red-600">0</p>
+      <p class="text-sm">Rejected</p>
+      <h2 id="rejectedCount" class="text-2xl font-bold text-red-600">0</h2>
     </div>
   </div>
 
-  <!-- Section Header -->
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-xl font-bold">Available Jobs</h2>
-    <p id="tabCount" class="font-semibold">8 Jobs</p>
+  <!-- Available Jobs -->
+  <div class="bg-white rounded shadow p-4">
+
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="font-semibold">Available Jobs</h2>
+      <span id="jobCount" class="text-sm text-gray-500">0 jobs</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-3 mb-4">
+      <button data-tab="all" class="tabBtn bg-blue-600 text-white px-4 py-1 rounded">All</button>
+      <button data-tab="interview" class="tabBtn bg-gray-200 px-4 py-1 rounded">Interview</button>
+      <button data-tab="rejected" class="tabBtn bg-gray-200 px-4 py-1 rounded">Rejected</button>
+    </div>
+
+    <!-- Jobs -->
+    <div id="jobsContainer" class="space-y-4"></div>
+
   </div>
-
-  <!-- Tabs -->
-  <div class="flex gap-3 mb-4">
-    <button data-tab="all" class="tabBtn bg-blue-600 text-white px-4 py-1 rounded">All</button>
-    <button data-tab="interview" class="tabBtn bg-gray-300 px-4 py-1 rounded">Interview</button>
-    <button data-tab="rejected" class="tabBtn bg-gray-300 px-4 py-1 rounded">Rejected</button>
-  </div>
-
-  <!-- Jobs Container -->
-  <div id="jobsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-
 </div>
 
-<script>
-const jobs = [
-  {id:1,company:"Google",position:"Frontend Developer",location:"Remote",type:"Full-Time",salary:"$3500",desc:"Build UI components",status:"all"},
-  {id:2,company:"Microsoft",position:"Backend Developer",location:"USA",type:"Full-Time",salary:"$4000",desc:"Work with APIs",status:"all"},
-  {id:3,company:"Meta",position:"UI Engineer",location:"Remote",type:"Contract",salary:"$3000",desc:"Design UI systems",status:"all"},
-  {id:4,company:"Netflix",position:"JS Engineer",location:"Canada",type:"Full-Time",salary:"$4200",desc:"Build scalable UI",status:"all"},
-  {id:5,company:"Amazon",position:"Web Developer",location:"India",type:"Full-Time",salary:"$2800",desc:"Develop dashboards",status:"all"},
-  {id:6,company:"Stripe",position:"Frontend Dev",location:"Remote",type:"Contract",salary:"$3600",desc:"Modern UI apps",status:"all"},
-  {id:7,company:"Shopify",position:"UI Developer",location:"Remote",type:"Full-Time",salary:"$3200",desc:"Create UI layouts",status:"all"},
-  {id:8,company:"Adobe",position:"JS Engineer",location:"UK",type:"Full-Time",salary:"$3900",desc:"Interactive apps",status:"all"},
-];
-
-let activeTab = "all";
-
-function render() {
-  const container = document.getElementById("jobsContainer");
-  container.innerHTML = "";
-
-  const filtered = activeTab === "all" ? jobs : jobs.filter(j => j.status === activeTab);
-
-  document.getElementById("tabCount").innerText = filtered.length + " Jobs";
-
-  if (!filtered.length) {
-    container.innerHTML = `
-      <div class="col-span-full text-center py-12">
-        <p class="text-xl font-semibold">No Jobs Available</p>
-        <p class="text-gray-500">Please check another tab</p>
-      </div>`;
-    return;
-  }
-
-  filtered.forEach(job => {
-    container.innerHTML += `
-      <div class="bg-white p-4 rounded shadow">
-        <h3 class="font-bold text-lg">${job.company}</h3>
-        <p class="font-semibold">${job.position}</p>
-        <p class="text-sm">${job.location} | ${job.type}</p>
-        <p class="text-sm font-semibold">Salary: ${job.salary}</p>
-        <p class="text-sm mt-2">${job.desc}</p>
-
-        <div class="flex flex-wrap gap-2 mt-4">
-          <button data-id="${job.id}" data-action="interview"
-            class="px-3 py-1 bg-green-500 text-white rounded">Interview</button>
-
-          <button data-id="${job.id}" data-action="rejected"
-            class="px-3 py-1 bg-red-500 text-white rounded">Rejected</button>
-
-          <button data-id="${job.id}" data-action="delete"
-            class="px-3 py-1 bg-gray-700 text-white rounded">Delete</button>
-        </div>
-      </div>
-    `;
-  });
-
-  updateCounts();
-}
-
-function updateCounts() {
-  document.getElementById("totalCount").innerText = jobs.length;
-  document.getElementById("interviewCount").innerText =
-    jobs.filter(j => j.status === "interview").length;
-  document.getElementById("rejectedCount").innerText =
-    jobs.filter(j => j.status === "rejected").length;
-}
-
-/* Event Delegation */
-document.getElementById("jobsContainer").addEventListener("click", e => {
-  const btn = e.target.closest("button");
-  if (!btn) return;
-
-  const id = Number(btn.dataset.id);
-  const action = btn.dataset.action;
-
-  const job = jobs.find(j => j.id === id);
-
-  if (action === "delete") {
-    const index = jobs.findIndex(j => j.id === id);
-    jobs.splice(index, 1);
-  } else {
-    job.status = action;
-    activeTab = action;
-  }
-  render();
-});
-
-document.querySelectorAll(".tabBtn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".tabBtn").forEach(b => b.classList.remove("bg-blue-600","text-white"));
-    btn.classList.add("bg-blue-600","text-white");
-    activeTab = btn.dataset.tab;
-    render();
-  });
-});
-
-render();
-</script>
-
+<script src="js/main.js"></script>
 </body>
 </html>
